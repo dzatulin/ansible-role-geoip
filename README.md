@@ -1,5 +1,5 @@
-# Ansible Packages Role
-Role for installing, removing and updating packages
+# Ansible Role GeoIP
+Role for installing and updating GeoIP database
 ## Requirements
 Ansible version: 2.9
 Centos / Debian / Ubuntu
