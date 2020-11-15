@@ -1,0 +1,36 @@
+---
+#- name: Install Maxmind GeoIP tools | RedHat
+#  package:
+#    name: '{{ maxmind_update_package_rhel }}'
+#    state: present
+  - name: check if package installed
+    command: rpm -q --qf "%{VERSION}\n" geoipupdate
+    args:
+              warn: false
+    register: package_installed
+    failed_when: false
+    changed_when: package_installed.rc != 0
+  - name: check package version
+    shell: "[[ `rpm -q --qf \"%{VERSION}\n\" geoipupdate` == 4.2.2 ]]"
+    args:
+      warn: false
+    register: package_installed_version
+    failed_when: false
+    changed_when: package_installed_version.rc != 0
+  - name: uninstall old package
+    yum:
+      name: geoipupdate
+      state: removed
+    when: package_installed_version.rc != 0 and package_installed.rc == 0
+  - name: copy package-rpm to /tmp
+    copy:
+      src: /etc/ansible/roles/ansible-role-geoip/templates/geoipupdate_4.5.0_linux_amd64.rpm
+      dest: /tmp/
+#    notify:
+#      - remove package-rpm from /tmp
+    when: package_installed_version.rc != 0
+  - name: install package
+    yum:
+      name: /tmp/geoipupdate_4.5.0_linux_amd64.rpm
+      state: present
+    when: package_installed_version.rc != 0
